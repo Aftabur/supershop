@@ -1,0 +1,12 @@
+.categoryadd_body{
+    background: #ffff;
+    padding: 20px;
+    box-shadow: 0px 0px 2px 1px rgba(0,0,0,.2);
+}
+.product_tbl th{
+    font-size:13px;
+    text-align: center;
+}
+table.product_tbl.dataTable thead>tr>th.sorting{
+    padding-right:15px;
+}
