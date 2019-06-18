@@ -20,7 +20,7 @@
                 @endif
 
             <div class="categoryadd_body">
-                    <form action="{{route('admin.product.updateProduct')}}" method="POST">
+                    <form action="{{route('admin.product.updateProduct')}}" method="POST" enctype="multipart/form-data">
                         @csrf
                         <div class="form-group">
                             <label for="categoryName">Product Name:</label>
@@ -78,6 +78,13 @@
                             <label for="productLongDescription">product Long Description:</label>
                             <textarea class="form-control" rows="5" id="productLongDescription" name="productLongDescription" required> {{$selectData->productLongDescription}}</textarea>
                             <span class="text-danger">{{$errors->has('productLongDescription') ? $errors->first('productLongDescription'):''}}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="">Product Image</label>
+                            <input type="file" name="productImage" id="productImage" class="form-control">
+                            <img src="{{asset('attendance_file/'.$selectData->productImage)}}" alt="" class="img-fluid">
+                            <span class="text-danger">{{$errors->has('productImage') ? $errors->first('productImage'):''}}</span>
+
                         </div>
                         <div class="form-group">
                             <label for="sel1">Publication Status:</label>

@@ -32,19 +32,7 @@ class ProductController extends Controller
 
             'publicationStatus'=>'required',
         ]);
-        // $saveData=DB::table('products')->insert([
-        //     "productName"=>$request->productName,
-        //     "categoryId"=>$request->categoryId,
-        //     "manufacturerId"=>$request->manufacturerId,
-        //     "productPrice"=>$request->productPrice,
-        //     "productQuantity"=>$request->productQuantity,
-        //     "productShortDescription"=>$request->productShortDescription,
-        //     "productLongDescription"=>$request->productLongDescription,
-        //     "productImage"=>$request->productImage,
-        //     "publicationStatus"=>$request->publicationStatus,
-        // ]);
-        // Session::flash('message', 'Information has been successfully Added!');
-        // return redirect()->back();
+
 
         if($file=$request->file('productImage')){
             if($file->getSize()>1000000){
@@ -53,17 +41,6 @@ class ProductController extends Controller
 
             $name=time().".".$file->getClientOriginalExtension();
             $file->move(('attendance_file'),$name);
-
-            // $this->validate($request,[
-            //     'productName'=>'required',
-            //     'productPrice'=>'required',
-            //     'productQuantity'=>'required',
-            //     'productShortDescription'=>'required',
-            //     'productLongDescription'=>'required',
-            //     'productImage'=>'required',
-
-            //     'publicationStatus'=>'required',
-            // ]);
 
             DB::table('products')->insert([
                     'productImage'=>$name,
@@ -76,6 +53,7 @@ class ProductController extends Controller
                     "productLongDescription"=>$request->productLongDescription,
                     "publicationStatus"=>$request->publicationStatus,
             ]);
+
         }
         Session::flash('message', 'Information has been successfully Added!');
         return redirect()->back();
@@ -105,30 +83,48 @@ class ProductController extends Controller
 
     public function updateProduct(Request $request){
 
-        $this->validate($request,[
-            'productName'=>'required',
-            'categoryId'=>'required',
-            'manufacturerId'=>'required',
-            'productPrice'=>'required',
-            'productQuantity'=>'required',
-            'productShortDescription'=>'required',
-            'productLongDescription'=>'required',
-            'publicationStatus'=>'required',
-        ]);
-        $saveData=DB::table('products')->where('id',$request->id)->update([
-            "productName"=>$request->productName,
-            "categoryId"=>$request->categoryId,
-            "manufacturerId"=>$request->manufacturerId,
-            "productPrice"=>$request->productPrice,
-            "productQuantity"=>$request->productQuantity,
-            "productShortDescription"=>$request->productShortDescription,
-            "productLongDescription"=>$request->productLongDescription,
-            "publicationStatus"=>$request->publicationStatus,
-        ]);
-        // return $request->all();
-        // var_dump($saveData);
-        Session::flash('message', 'Information has been successfully Updated!');
-        return redirect()->route('admin.product.manageProduct');
+        if($request->hasFile('productImage')){
+
+
+            if($file=$request->file('productImage')){
+                if($file->getSize()>1000000){
+                        return response()->json(['errors'=> ["File size limit exceeded. Max size limit is 10 MB"]]);
+                }
+
+                $name=time().".".$file->getClientOriginalExtension();
+                $file->move(('attendance_file'),$name);
+
+                DB::table('products')->where('id',$request->id)->update([
+                        'productImage'=>$name,
+                        "productName"=>$request->productName,
+                        "categoryId"=>$request->categoryId,
+                        "manufacturerId"=>$request->manufacturerId,
+                        "productPrice"=>$request->productPrice,
+                        "productQuantity"=>$request->productQuantity,
+                        "productShortDescription"=>$request->productShortDescription,
+                        "productLongDescription"=>$request->productLongDescription,
+                        "publicationStatus"=>$request->publicationStatus,
+                ]);
+
+            }
+            Session::flash('message', 'Information has been successfully Updated with Image!');
+            return redirect()->route('admin.product.manageProduct');
+        }else{
+            DB::table('products')->where('id',$request->id)->update([
+
+                "productName"=>$request->productName,
+                "categoryId"=>$request->categoryId,
+                "manufacturerId"=>$request->manufacturerId,
+                "productPrice"=>$request->productPrice,
+                "productQuantity"=>$request->productQuantity,
+                "productShortDescription"=>$request->productShortDescription,
+                "productLongDescription"=>$request->productLongDescription,
+                "publicationStatus"=>$request->publicationStatus,
+            ]);
+            Session::flash('message', 'Information has been successfully Updated without Image!');
+            return redirect()->route('admin.product.manageProduct');
+        }
+
 
     }
 
@@ -139,11 +135,6 @@ class ProductController extends Controller
     }
 
     public function viewProduct($id){
-        // $viewdata=DB::table('products')->where('id','=',$id)->first();
-
-
-
-
         $viewdata=DB::table('products')
         ->leftJoin('categories','products.categoryId','=','categories.id')
         ->leftJoin('manufacturers','products.manufacturerId','=','manufacturers.id')
@@ -151,7 +142,6 @@ class ProductController extends Controller
         ->select('products.*','categories.categoryName','manufacturers.manufacturerName')
         ->where('products.id',$id)
         ->first();
-
 
         return view('admin.product.viewProduct',compact('viewdata'));
     }
